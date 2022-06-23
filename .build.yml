@@ -1,0 +1,28 @@
+image: openbsd/latest
+packages:
+  - gmake
+secrets:
+  - 5fb737e2-2f77-4fa1-825c-b8bd7f2c37a6
+sources:
+  - git@git.sr.ht:~poldy/smackage
+environment:
+  SMACKAGE_HOME: /opt/smackage
+tasks:
+  - install-polyml: |
+      curl -O https://patchouli.sr.ht/builds.sr.ht/artifacts/~poldy/746044/74605ce5e0859d0d/polyml.tar.gz
+      doas mkdir -p /opt/polyml
+      doas chown $USER:$USER /opt/polyml
+      cd /opt
+      tar -xvzf $HOME/polyml.tar.gz
+  - prep: |
+      doas mkdir -p /opt/smackage
+      doas chown $USER:$USER /opt/smackage
+  - compile: |
+      cd $HOME/smackage
+      gmake polyml
+      DESTDIR=$SMACKAGE_HOME gmake install
+  - package: |
+      cd /opt
+      tar -cvzf $HOME/smackage.tar.gz smackage
+artifacts:
+  - smackage.tar.gz
